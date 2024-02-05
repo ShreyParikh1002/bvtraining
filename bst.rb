@@ -35,26 +35,21 @@ class BST
 	end
  
 	def level_order
-		traverse  = Queue.new
+		traverse = Queue.new
 		traverse.enq(root)
+		cur_level = []
 		while !traverse.empty?
-			len = traverse.length
-			cur_level = []
-			while len > 0
-				cur = traverse.deq
-				cur_level.push(cur.val)
-				if cur.left != nil
-					traverse.enq(cur.left)
-				end
-				if cur.right != nil
-					traverse.enq(cur.right)
-				end
-				len-=1
+			cur = traverse.deq
+			cur_level.push(cur.val)
+			if cur.left != nil
+				traverse.enq(cur.left)
 			end
-			cur_level.each { |elem| print "#{elem} " }
-			puts "\n"
-			return cur_level
+			if cur.right != nil
+				traverse.enq(cur.right)
+			end
 		end
+		cur_level.each { |elem| print "#{elem} " }
+		return cur_level
 	end
 end
 
@@ -117,11 +112,14 @@ end
 
 def print_smallest(root)
 	cur = root
+	prev = cur
 	while cur != nil
 		smallest = cur.val
+		prev = cur
 		cur = cur.left
 	end
 	puts "Smallest element is #{smallest}"
+	return prev	
 end
 
 def search(root, val)
@@ -141,6 +139,31 @@ def search(root, val)
 	puts "Element #{val} not present in BST"
 end
 
+def delete(root, val)
+	if root.nil? 
+		return root
+	end
+	if val > root.val
+		root.right = delete(root.right, val)
+	elsif val < root.val
+		root.left = delete(root.left, val)
+	else 
+		if root.left.nil?
+			return root.right
+		elsif root.right.nil?
+			return root.left
+		else
+			cur = root.right
+			while !cur.left.nil?
+				cur = cur.left
+			end
+			root.val = cur.val
+			root.right = delete(root.right, root.val)
+		end
+	end
+	return root
+end
+
 while true 
 	puts "enter 1 to initialise BST and 0 to quit"
 	@choice = gets.chomp
@@ -157,13 +180,13 @@ while true
 				@choice = 0
 				temp_arr = @root_node.level_order
 				file = File.open("bst.txt", 'w')
-				file.puts(temp_arr.join(','))
+				file.write(temp_arr.join(','))
 				file.close
 				break
 			when "1" == operation
-				@ele_arr
-				file_choice = gets.chomp
+				@ele_arr = []
 				puts "Do you want to create tree from file enter Y or N"
+				file_choice = gets.chomp
 				if 'Y' == file_choice
 					file = File.open("bst.txt", 'r')
 					content = file.read
@@ -173,11 +196,12 @@ while true
 					ele = gets.chomp
 					@ele_arr = ele.split(',')
 				end
+				@ele_arr.each { |elem| print "#{elem} ," }
 				for cur_ele in @ele_arr
 					if nil == @root_node
-						@root_node = BST.new(cur_ele)
+						@root_node = BST.new(cur_ele.to_i)
 					else
-						@root_node.insert(cur_ele)
+						@root_node.insert(cur_ele.to_i)
 					end
 				end
 			when "2" == operation
@@ -197,27 +221,15 @@ while true
 			when "5" == operation
 				puts "Enter element to search :"
 				ele = gets.chomp.to_i
-				search(@root_node.root,ele)
+				search(@root_node.root, ele)
 			when "6" == operation
 				puts "Enter element to delete :"
 				ele = gets.chomp.to_i
-				@found = search(@root_node.root,ele)
-				if @found != nil
-					if @found.left.nil? && @found.right.nil?
-						@found = nil
-					elsif !@found.left.nil? && @found.right.nil?
-						@found = @found.left
-					elsif @found.left.nil? && !@found.right.nil? 
-						@found = @found.right
-					end
-					puts "found #{@found.val}"
-				end
-			  @root_node.level_order
-				#print_largest(found.left)
+				delete(@root_node.root, ele)
 			when "7" == operation
 			 	puts "printing all paths"
 				arr = []
-				dfs(@root_node.root,arr)
+				dfs(@root_node.root, arr)
 			end
 		end
 	end
