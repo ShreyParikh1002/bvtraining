@@ -32,12 +32,14 @@ class LinkedList
 		end
 		prev.next = LinkedListNode.new(val)
 	end
-	
+
 	# have created a function search_prev_LL which returns the node
 	# just before the required element to improve code reusability
 	def search(val)
 		prev = search_prev_LL(@head, val)
-		if prev.next.nil?
+		if prev.nil?
+			puts "Element found at position 0"
+		elsif prev.next.nil?
 			puts "Element #{val} not found"
 		else
 			puts "Element found"
@@ -56,7 +58,7 @@ class LinkedList
 			prev.next = prev.next.next
 			puts "Element #{val} deleted"
 		end
-		return @head;
+		@head;
 	end
 
 	def print_ll
@@ -67,11 +69,24 @@ class LinkedList
 		end
 	end
 
+	def reverse_ll
+		cur = @head
+		nxt = nil
+		prev = nil
+		while !cur.nil?
+			nxt = cur.next
+			cur.next = prev
+			prev = cur
+			cur = nxt
+		end
+		@head = prev
+		puts "Reversed"
+	end
 end
 
 class BST
 	attr_accessor :root
-	
+
 	def initialize(val=nil)
 		@root = Node.new(val)
 	end
@@ -93,7 +108,7 @@ class BST
 		end
 		puts "inserted #{val}"
 	end
- 
+
 	def level_order
 		traverse = Queue.new
 		traverse.enq(root)
@@ -109,40 +124,102 @@ class BST
 			end
 		end
 		cur_level.each { |elem| print "#{elem} " }
-		return cur_level
+		cur_level
 	end
-end
 
-def inorder_traversal(root)
-	if nil == root
-		return
+	def preorder_traversal(cur = @root)
+		if nil == cur
+			return
+		end
+		print "#{cur.val} "
+		preorder_traversal(cur.left)
+		preorder_traversal(cur.right)
 	end
-	inorder_traversal(root.left)
-	print "#{root.val} "
-	inorder_traversal(root.right)
-end
 
-def postorder_traversal(root)
-	if nil == root
-		return
+	def inorder_traversal(cur = @root)
+		if nil == cur
+			return
+		end
+		inorder_traversal(cur.left)
+		print "#{cur.val} "
+		inorder_traversal(cur.right)
 	end
-	postorder_traversal(root.left)
-	postorder_traversal(root.right)
-	print "#{root.val} "
-end
 
-def preorder_traversal(root)
-	if nil == root
-		return
+	def postorder_traversal(cur = @root)
+		if nil == cur
+			return
+		end
+		postorder_traversal(cur.left)
+		postorder_traversal(cur.right)
+		print "#{cur.val} "
 	end
-	print "#{root.val} "
-	preorder_traversal(root.left)
-	preorder_traversal(root.right)
-end
 
-def all_paths(root)
-	arr = []
-	dfs_helper(root, arr)
+	def all_paths(root = @root)
+		arr = []
+		dfs_helper(root, arr)
+	end
+
+	def delete(cur_node = @root, val)
+		if cur_node.nil? 
+			return cur_node
+		end
+		if val > cur_node.val
+			cur_node.right = delete(cur_node.right, val)
+		elsif val < cur_node.val
+			cur_node.left = delete(cur_node.left, val)
+		else
+
+			if cur_node.left.nil?
+				return cur_node.right
+			elsif cur_node.right.nil?
+				return cur_node.left
+			else
+				cur = cur_node.right
+				while !cur.left.nil?
+					cur = cur.left
+				end
+				cur_node.val = cur.val
+				cur_node.right = delete(cur_node.right, cur_node.val)
+			end
+		end
+		cur_node
+	end
+
+	def print_largest
+		cur = @root
+		while cur != nil
+			largest = cur.val
+			cur = cur.right
+		end
+		puts "Largest element is #{largest}"
+	end
+
+	def print_smallest
+		cur = @root
+		while cur != nil
+			smallest = cur.val
+			prev = cur
+			cur = cur.left
+		end
+		puts "Smallest element is #{smallest}"	
+	end
+
+	def search(val)
+		cur = @root
+		while cur != nil
+			if val == cur.val
+				puts "Element #{val} found in BST"
+				return cur
+			elsif cur.val > val
+				prev = cur
+				cur = cur.left
+			else 
+				prev = cur
+				cur = cur.right
+			end
+		end
+		puts "Element #{val} not present in BST"
+	end
 end
 
 def dfs_helper(root, arr)
@@ -168,75 +245,9 @@ def dfs_helper(root, arr)
 	arr.pop()
 end
 
-def print_largest(root)
-	cur = root
-	while cur != nil
-		largest = cur.val
-		cur = cur.right
-	end
-	puts "Largest element is #{largest}"
-end
-
-def print_smallest(root)
-	cur = root
-	prev = cur
-	while cur != nil
-		smallest = cur.val
-		prev = cur
-		cur = cur.left
-	end
-	puts "Smallest element is #{smallest}"
-	return prev	
-end
-
-def search(root, val)
-	cur = root
-	while cur != nil
-		if val == cur.val
-			puts "Element #{val} found in BST"
-			return cur
-		elsif cur.val > val
-			prev = cur
-			cur = cur.left
-		else 
-			prev = cur
-			cur = cur.right
-		end
-	end
-	puts "Element #{val} not present in BST"
-end
-
-def delete(root, val)
-	if root.nil? 
-		return root
-	end
-	if val > root.val
-		root.right = delete(root.right, val)
-	elsif val < root.val
-		root.left = delete(root.left, val)
-	else
-
-		if root.left.nil?
-			return root.right
-		elsif root.right.nil?
-			return root.left
-		else
-			cur = root.right
-			while !cur.left.nil?
-				cur = cur.left
-			end
-			root.val = cur.val
-			root.right = delete(root.right, root.val)
-		end
-
-	end
-	return root
-end
-
 def search_prev_LL(root, val)
 	cur = root
-	prev = LinkedListNode.new(-1)
-	prev.next = root
+	prev = nil
 	while !cur.nil?
 		if val == cur.val
 			return prev
@@ -244,173 +255,145 @@ def search_prev_LL(root, val)
 		prev = cur
 		cur = cur.next
 	end
-	return prev
-end
-
-def reverse_ll(head)
-	cur = head
-	nxt = nil
-	prev = nil
-	while !cur.nil?
-		nxt = cur.next
-		cur.next = prev
-		prev = cur
-		cur = nxt
-	end
-	puts "Reversed"
-	return prev
+	prev
 end
 
 def not_null_check(node)
-	if node.nil?
+	if node.val.nil?
 		puts "Empty"
 		return false
 	end
-	return true
+	true
 end
 
 def main
 	while true 
-		puts "Welcome to BlogVault training\nEnter 0 to quit\nEnter 1 to initialise a BST\nEnter 2 to initialise a Linked List"
-		@choice = gets.chomp
-		case
-		when "0" == @choice
+		puts "Welcome to BlogVault training\nEnter quit to exit\nEnter 1 to initialise a BST\nEnter 2 to initialise a Linked List"
+		case gets.chomp
+		when "quit"
 			break
-
-		when "1" == @choice
-			@root_node = nil
+		when "1"
+			root_node = BST.new(nil)
 			puts "initialised BST"
 			while true
 				puts "insert operation number"
-				operation = gets.chomp
-				case
-				when "0" == operation
-					@choice = 0
+				case gets.chomp
+				when "quit"
 					file_arr = []
-					if !@root_node.nil?
-						file_arr = @root_node.level_order
+					if !root_node.root.val.nil?
+						file_arr = root_node.level_order
 					end
 					file = File.open("bst.txt", 'w')
 					file.write(file_arr.join(','))
 					file.close
 					break
-
-				when "1" == operation
+				when "1"
 					puts "Do you want to create tree from file enter Y or N"
 					file_choice = gets.chomp
+					element_arr = []
 					if 'Y' == file_choice
-						file = File.open("bst.txt", 'r')
-						content = file.read
-						element_arr = content.split(',')
+						puts "Enter file path "
+						file_path = gets.chomp
+						if File.exist?(file_path)
+							file = File.open(file_path, 'r')
+							content = file.read
+							element_arr = content.split(',')
+						else
+							puts "Invalid path"
+						end
 					else			
 						puts "Enter elements to be inserted, seperated by commas"
-						elements = gets.chomp
-						element_arr = elements.split(',')
+						element_arr = gets.chomp.split(',')
 					end
-
-					element_arr.each { |element| print "#{element} ," }
 					for cur_element in element_arr
-						if nil == @root_node
-							@root_node = BST.new(cur_element.to_i)
+						if nil == root_node.root.val
+							root_node = BST.new(cur_element.to_i)
 						else
-							@root_node.insert(cur_element.to_i)
+							root_node.insert(cur_element.to_i)
 						end
 					end
-
-				when "2" == operation
-					flag = not_null_check(@root_node)
-					if flag
-						print_largest(@root_node.root)
+				when "2" 
+					if not_null_check(root_node.root)
+						root_node.print_largest
 					end
-
-				when "3" == operation
-					flag = not_null_check(@root_node)
-					if flag
-						print_smallest(@root_node.root)
+				when "3" 
+					if not_null_check(root_node.root)
+						root_node.print_smallest
 					end
-
-				when "4" == operation
-					flag = not_null_check(@root_node)
-					if flag
+				when "4" 
+					if not_null_check(root_node.root)
 						puts "\nLevelorder : "
-						@root_node.level_order
+						root_node.level_order
 						puts "\nInorder : "
-						inorder_traversal(@root_node.root)
+						root_node.inorder_traversal
 						puts "\nPreorder : "
-						preorder_traversal(@root_node.root)
+						root_node.preorder_traversal
 						puts "\nPostorder : "
-						postorder_traversal(@root_node.root)
+						root_node.postorder_traversal
 						puts "\n"
 					end
-
-				when "5" == operation
-					flag = not_null_check(@root_node)
-					if flag
+				when "5" 
+					if not_null_check(root_node.root)
 						puts "Enter element to search :"
 						element = gets.chomp.to_i
-						search(@root_node.root, element)
+						root_node.search( element)
 					end
-				when "6" == operation
-					flag = not_null_check(@root_node)
-					if flag
+				when "6" 
+					if not_null_check(root_node.root)
 						puts "Enter element to delete :"
 						element = gets.chomp.to_i
-						delete(@root_node.root, element)
+						root_node.root = root_node.delete(element)
+						if root_node.root.nil?
+							root_node = BST.new(nil)
+						end
 					end
-				when "7" == operation
-					puts "printing all paths"
-					flag = not_null_check(@root_node)
-					if flag
-						all_paths(@root_node.root)
+				when "7" 
+					if not_null_check(root_node.root)
+						puts "printing all paths"
+						root_node.all_paths
 					end
 				end
 			end
-		when "2" == @choice
-
-			@linked_list = nil
+		when "2"
+			linked_list = LinkedList.new(nil)
 			puts "initialised linked list"
 			while true
 				puts "\nInsert operation number"
-				operation = gets.chomp
-				case
-				when "0" == operation
+				case gets.chomp
+				when "quit"
 					break
-				when "1" == operation
-					flag = not_null_check(@linked_list)
-					if flag
+				when "1"
+					if not_null_check(linked_list.head)
 						puts "Enter element to search :"
 						element = gets.chomp.to_i
-						@linked_list.search(element)
+						linked_list.search(element)
 					end
-
-				when "2" == operation			
+				when "2" 			
 					puts "Enter elements to be inserted, seperated by commas"
-					elements = gets.chomp
-					element_arr = elements.split(',')
+					element_arr = gets.chomp.split(',')
 					for cur_element in element_arr
-						if nil == @linked_list
-							@linked_list = LinkedList.new(cur_element.to_i)
+						if nil == linked_list.head.val
+							linked_list = LinkedList.new(cur_element.to_i)
 						else
-							@linked_list.insert(cur_element.to_i)
+							linked_list.insert(cur_element.to_i)
 						end
 					end
-
-				when "3" == operation
-					flag = not_null_check(@linked_list)
-					if flag
+				when "3"
+					if not_null_check(linked_list.head)
 						puts "Enter element to be deleted :"
 						element = gets.chomp.to_i
-						@linked_list.delete(element)
+						linked_list.head = linked_list.delete(element)
+						if linked_list.head.nil?
+							linked_list = LinkedList.new(nil)
+						end
 					end
-				when "4" == operation 
-					flag = not_null_check(@linked_list)
-					if flag
-						@linked_list.head = reverse_ll(@linked_list.head)
+				when "4" 
+					if not_null_check(linked_list.head)
+						linked_list.reverse_ll
 					end
-				when "5" == operation
-					flag = not_null_check(@linked_list)
-					if flag
-						@linked_list.print_ll
+				when "5" 
+					if not_null_check(linked_list.head)
+						linked_list.print_ll
 					end
 				end
 			end
