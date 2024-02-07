@@ -48,8 +48,7 @@ class LinkedList
 
 	def delete(val)
 		if @head.val == val
-			@head = @head.next
-			return
+			return @head.next
 		end
 		prev = search_prev_LL(@head, val)
 		if prev.next.nil?
@@ -58,6 +57,7 @@ class LinkedList
 			prev.next = prev.next.next
 			puts "Element #{val} deleted"
 		end
+
 		@head;
 	end
 
@@ -124,6 +124,7 @@ class BST
 			end
 		end
 		cur_level.each { |elem| print "#{elem} " }
+	
 		cur_level
 	end
 
@@ -182,6 +183,7 @@ class BST
 				cur_node.right = delete(cur_node.right, cur_node.val)
 			end
 		end
+	
 		cur_node
 	end
 
@@ -255,10 +257,11 @@ def search_prev_LL(root, val)
 		prev = cur
 		cur = cur.next
 	end
+	
 	prev
 end
 
-def not_null_check(node)
+def not_null?(node)
 	if node.val.nil?
 		puts "Empty"
 		return false
@@ -273,15 +276,15 @@ def main
 		when "quit"
 			break
 		when "1"
-			root_node = BST.new(nil)
-			puts "initialised BST"
+			bst = BST.new(nil)
+			puts "Initialised BST"
 			while true
-				puts "insert operation number"
+				puts "Insert operation number"
 				case gets.chomp
 				when "quit"
 					file_arr = []
-					if !root_node.root.val.nil?
-						file_arr = root_node.level_order
+					if !bst.root.val.nil?
+						file_arr = bst.level_order
 					end
 					file = File.open("bst.txt", 'w')
 					file.write(file_arr.join(','))
@@ -306,64 +309,64 @@ def main
 						element_arr = gets.chomp.split(',')
 					end
 					for cur_element in element_arr
-						if nil == root_node.root.val
-							root_node = BST.new(cur_element.to_i)
+						if nil == bst.root.val
+							bst.root.val = cur_element.to_i
 						else
-							root_node.insert(cur_element.to_i)
+							bst.insert(cur_element.to_i)
 						end
 					end
 				when "2" 
-					if not_null_check(root_node.root)
-						root_node.print_largest
+					if not_null?(bst.root)
+						bst.print_largest
 					end
 				when "3" 
-					if not_null_check(root_node.root)
-						root_node.print_smallest
+					if not_null?(bst.root)
+						bst.print_smallest
 					end
 				when "4" 
-					if not_null_check(root_node.root)
+					if not_null?(bst.root)
 						puts "\nLevelorder : "
-						root_node.level_order
+						bst.level_order
 						puts "\nInorder : "
-						root_node.inorder_traversal
+						bst.inorder_traversal
 						puts "\nPreorder : "
-						root_node.preorder_traversal
+						bst.preorder_traversal
 						puts "\nPostorder : "
-						root_node.postorder_traversal
+						bst.postorder_traversal
 						puts "\n"
 					end
 				when "5" 
-					if not_null_check(root_node.root)
+					if not_null?(bst.root)
 						puts "Enter element to search :"
 						element = gets.chomp.to_i
-						root_node.search( element)
+						bst.search( element)
 					end
 				when "6" 
-					if not_null_check(root_node.root)
+					if not_null?(bst.root)
 						puts "Enter element to delete :"
 						element = gets.chomp.to_i
-						root_node.root = root_node.delete(element)
-						if root_node.root.nil?
-							root_node = BST.new(nil)
+						bst.root = bst.delete(element)
+						if bst.root.nil?
+							bst = BST.new(nil)
 						end
 					end
 				when "7" 
-					if not_null_check(root_node.root)
-						puts "printing all paths"
-						root_node.all_paths
+					if not_null?(bst.root)
+						puts "Printing all paths"
+						bst.all_paths
 					end
 				end
 			end
 		when "2"
 			linked_list = LinkedList.new(nil)
-			puts "initialised linked list"
+			puts "Initialised linked list"
 			while true
 				puts "\nInsert operation number"
 				case gets.chomp
 				when "quit"
 					break
 				when "1"
-					if not_null_check(linked_list.head)
+					if not_null?(linked_list.head)
 						puts "Enter element to search :"
 						element = gets.chomp.to_i
 						linked_list.search(element)
@@ -373,13 +376,13 @@ def main
 					element_arr = gets.chomp.split(',')
 					for cur_element in element_arr
 						if nil == linked_list.head.val
-							linked_list = LinkedList.new(cur_element.to_i)
+							linked_list.head.val = cur_element.to_i
 						else
 							linked_list.insert(cur_element.to_i)
 						end
 					end
 				when "3"
-					if not_null_check(linked_list.head)
+					if not_null?(linked_list.head)
 						puts "Enter element to be deleted :"
 						element = gets.chomp.to_i
 						linked_list.head = linked_list.delete(element)
@@ -388,11 +391,11 @@ def main
 						end
 					end
 				when "4" 
-					if not_null_check(linked_list.head)
+					if not_null?(linked_list.head)
 						linked_list.reverse_ll
 					end
 				when "5" 
-					if not_null_check(linked_list.head)
+					if not_null?(linked_list.head)
 						linked_list.print_ll
 					end
 				end
